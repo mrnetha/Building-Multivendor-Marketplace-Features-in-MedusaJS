@@ -1,0 +1,4 @@
+router.post("/vendors/:vendorId/products", VendorController.addProduct);
+router.put("/vendors/:vendorId/products/:productId", VendorController.editProduct);
+router.delete("/vendors/:vendorId/products/:productId", VendorController.deleteProduct);
+router.put("/vendors/:vendorId/products/:productId/stock", VendorController.updateStock);
