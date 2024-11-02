@@ -1,0 +1,86 @@
+import { BaseService } from "medusa-interfaces";
+
+class OrderService extends BaseService {
+    async createOrder(data) {
+        const order = await super.createOrder(data);
+        
+        // Notify vendor of the new order
+        await this.notifyVendor(order);
+        
+        return order;
+    }
+
+    async notifyVendor(order) {
+        const vendorEmail = order.vendor.email;
+        const subject = "New Order Received!";
+        const message = `You've received a new order. Order ID: ${order.id}`;
+
+        await this.emailService.send({
+            to: vendorEmail,
+            subject,
+            text: message
+        });
+    }
+}
+
+export default OrderService;
+module.exports = {
+  projectConfig: {
+    email_provider: {
+      provider: "smtp", // You could also use nodemailer, sendgrid, etc.
+      options: {
+        host: "smtp.example.com",
+        port: 587,
+        auth: {
+          user: "your-email@example.com",
+          pass: "your-password",
+        },
+      },
+    },
+  },
+};
+//Order service 
+async createOrder(data) {
+    const order = await super.createOrder(data);
+
+    // Calculate commission (10% of the total amount)
+    const commissionRate = 0.10;
+    const commissionAmount = order.total * commissionRate;
+
+    // Update vendor's earnings after deducting commission
+    const vendorEarnings = order.total - commissionAmount;
+
+    // Save the vendor's earnings
+    await this.vendorService.updateVendorEarnings(order.vendor_id, vendorEarnings);
+
+    return order;
+}
+3 display commission 
+async getEarnings(req, res) {
+    const vendorId = req.params.vendorId;
+    const earnings = await this.vendorService.calculateEarnings(vendorId);
+    
+    res.status(200).json({ earnings, commissionRate: "10%" });
+}
+//Payment system
+
+async requestPayout(req, res) {
+    const vendorId = req.params.vendorId;
+    
+    // Save the payout request
+    const payoutRequest = await this.payoutService.createPayoutRequest(vendorId);
+    
+    res.status(200).json({ message: "Payout requested", payoutRequest });
+}
+class PayoutService {
+    async createPayoutRequest(vendorId) {
+        // Create a record of the payout request
+        return await this.payoutRepository.create({ vendor_id: vendorId, status: "pending" });
+    }
+
+    async getPendingPayoutRequests() {
+        return await this.payoutRepository.find({ status: "pending" });
+    }
+}
+
+export default PayoutService;
