@@ -1,0 +1,6 @@
+// Ordermanagement
+router.get("/vendors/:vendorId/orders", VendorController.getOrders);
+router.put("/vendors/:vendorId/orders/:orderId", VendorController.updateOrderStatus);
+
+//Earning tracking
+router.get("/vendors/:vendorId/earnings", VendorController.getEarnings);
