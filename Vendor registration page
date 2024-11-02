@@ -1,0 +1,36 @@
+//Vender registration page
+Import { Router } from "express";
+import VendorController from "../controllers/vendor-controller";
+
+const router = Router();
+
+router.post("/vendors/register", VendorController.registerVendor);
+
+export default router;
+import { MedusaError } from "medusa-core-utils";
+import VendorService from "../services/vendor-service";
+
+class VendorController {
+    static async registerVendor(req, res) {
+        try {
+            const vendorData = req.body;
+            const vendor = await VendorService.createVendor(vendorData);
+            res.status(201).json(vendor);
+        } catch (err) {
+            throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, err.message);
+        }
+    }
+}
+
+export default VendorController;
+
+import { BaseService } from "medusa-interfaces";
+
+class VendorService extends BaseService {
+    async createVendor(vendorData) {
+        // Logic to save vendor in database
+        // Option(set `isApproved: false` for admin approval)
+    }
+}
+
+export default VendorService;
