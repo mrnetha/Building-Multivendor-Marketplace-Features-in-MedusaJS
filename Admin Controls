@@ -1,0 +1,4 @@
+router.put("/admin/vendors/:vendorId/approve", AdminController.approveVendor);
+router.delete("/admin/vendors/:vendorId", AdminController.suspendVendor);
+router.get("/admin/reports", AdminController.getMarketplaceReport);
+
